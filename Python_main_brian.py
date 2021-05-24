@@ -100,25 +100,25 @@ for i in range(0,ne):
 # Value function
 VV = math.pow(-10.0, 5);
 
-
-# Data structure of state and exogenous variables
+@jitclass(specs)
 class modelState(object):
-	def __init__(self,ind,ne,nx,T,age,P,xgrid,egrid,ssigma,bbeta,w,r):
-		self.ind		= ind
-		self.ne			= ne
-		self.nx			= nx
-		self.T			= T
-		self.age		= age
-		self.P			= P
-		self.xgrid		= xgrid
-		self.egrid		= egrid
-		self.ssigma		= ssigma
-		self.bbeta		= bbeta
-		self.w			= w
-		self.r			= r
+    def __init__(self,ind,ne,nx,T,age,P,xgrid,egrid,ssigma,bbeta,w,r):
+        self.ind        = ind
+        self.ne         = ne
+        self.nx         = nx
+        self.T          = T
+        self.age        = age
+        self.P          = P
+        self.xgrid      = xgrid
+        self.egrid      = egrid
+        self.ssigma     = ssigma
+        self.bbeta      = bbeta
+        self.w          = w
+        self.r          = r
 
 # Function that returns value for a given state
 # ind: a unique state that corresponds to a pair (ie,ix)
+@njit
 def value_func(states):
 
 	ind = states.ind
@@ -174,7 +174,7 @@ start = time.time()
 for age in reversed(range(0,T)):
 
     # This function computes `value_func` in parallel for all the states
-    results = Parallel(n_jobs=num_cores)(delayed(value_func)(modelState(ind,ne,nx,T,age,P,xgrid,egrid,ssigma,bbeta,w,r,V)) for ind in range(0,nx*ne))
+    results = Parallel(n_jobs=num_cores)(delayed(value_func)(modelState(ind,ne,nx,T,age,P,xgrid,egrid,ssigma,bbeta,w,r)) for ind in range(0,nx*ne))
 
     # I write the results on the value matrix: V
     for ind in range(0,nx*ne):
